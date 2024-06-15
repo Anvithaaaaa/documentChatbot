@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stylee.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Link to Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+</head>
+<body>
+<!-- Container for chat messages -->
+<div class="chat-container" style="width: calc(100% - 170px); 
+float: right;
+margin-right: 20px;"></div>
+<!-- Container for typing message -->
+<div class="typing-container">
+    <div class="typing-content">
+        <div class="typing-textarea">
+          <!-- Textarea for entering chat prompts -->
+            <textarea id="chat-input" spellcheck="false" placeholder="Enter a prompt here" required></textarea>
+            <!-- Button to send chat prompts -->
+            <span id="send-btn" class="material-symbols-rounded">send</span>
+        </div>
+        <div class="typing-controls">
+            <!-- Button to toggle theme -->
+            <span id="theme-btn" class="material-symbols-rounded">light_mode</span>
+        </div>
+    </div>
+</div>
+
+<!-- Container for uploading files -->
+<div id="sideContainer" class="side-container">
+  <!-- Form for uploading files -->
+  <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+      <div class="pdf-container">
+          <!-- Input for selecting files -->
+          <input type="file" name="folderInput" id="folderInput"  accept=".pdf,.txt, .doc, .docx, application/pdf ,text/plain" multiple required/>
+          <!-- Label for file input -->
+          <label for="folderInput" class="material-symbols-rounded">Folder</label>
+          <!-- Button to submit file upload -->
+          <button type="submit" id="uploadBtn">Upload</button>
+          <!-- Display upload status -->
+          <div id="uploadStatus"></div>
+          <!-- List to display uploaded PDF files -->
+          <ul id="pdfList" class="pdf-list"></ul>
+      </div>
+  </form>
+</div>
+<script>
+ 
+$(document).ready(function() {
+  $('#uploadBtn').on('click', function(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    var files = $('#folderInput')[0].files;
+    var formData = new FormData();
+
+    if (!files.length) {
+      alert('Please select one or more PDF files to upload.');
+      return; // Prevent form submission if no files are selected
+    }
+
+    for (var i = 0; i < files.length; i++) {
+      formData.append('folderInput', files[i]);
+    }
+
+    // Send AJAX request to upload files
+    $.ajax({
+      url: '/upload',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
+        if (response.success) {
+          
+          $('#uploadStatus').text(response.message);
+          
+        } else {
+          
+          $('#uploadStatus').text('Error uploading files!');
+        }
+      },
+      error: function(xhr, status, error) {
+        $('#uploadStatus').text('Error uploading files: ' + error);
+      }
+    });
+  });
+});
+
+
+
+</script>
+<!-- Include JavaScript file -->
+<script src="{{ url_for('static', filename='js/scriptt.js') }}"></script>
+</body>
+</html>
